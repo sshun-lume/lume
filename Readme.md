@@ -20,7 +20,7 @@ mlflowとjupyterlabはPythonのvirtualenv環境で`pip install mlflow`, `pip ins
 mlflow web UIとjupyterはssh tunnelingが必要です。
 EC2のセキュリティ設定でmyIPからのインバウンドを登録しておいてローカルPCで以下のようにしてtunnel接続を張ります。
 
->ssh -i <秘密鍵> -N -f -L 8888:localhost:8888 ubuntu@<EC2パブリックIP>
+>ssh -i <秘密鍵> -N -f -L 8888:localhost:8888 ubuntu@<EC2パブリックIP>  
 ssh -i <秘密鍵> -N -f -L 5000:localhost:5000 ubuntu@<EC2パブリックIP>
 
 AWS環境の時はmlflowのアーティファクトストレージをAWS S3に直接配置できます。
@@ -33,7 +33,7 @@ AWS環境の時はmlflowのアーティファクトストレージをAWS S3に�
 mlflowのtracking serverはローカルファイルシステムを指定し、確認用のweb UIだけを起動します。
 
 それぞれ
->jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+>jupyter lab --ip=0.0.0.0 --port=8888 --no-browser  
 mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlruns/mlflow.db
 
 で起動します。
