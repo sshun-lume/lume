@@ -64,3 +64,10 @@ mlflowのexperimentごとにアーティファクトストレージを設定で�
 3. EC2コンソールで当該インスタンスを選択してアクション>セキュリティ>IAMロールを変更
 　　3.1. 上で作成したロールをアタッチする
 
+### 2台以上で構成する場合（mlflowをserver modeで起動する場合）
+
+mlflowを以下でserver modeで起動しておきます。
+>mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlserver/mlflow.db
+
+ノートブック中のmlflowのtracking URIを以下のように指定します。
+>MLFLOW_TRACKING_URI = "http://<サーバのIP>:5000"
