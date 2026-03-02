@@ -51,6 +51,11 @@ def log_GPU_info(log_params):
             f"GPU_{i}_shMem": f'{particles.getShMem() /1024} [KB]',
         })
 
+def load_previous_state(prev_state):
+    particles.setup()
+    particles.readSerialization(prev_state)
+
+
 def create_initial_state(params, log_params, dump_file):
     """
     calcMD_CO2.cu の createInitialState() 相当の処理
