@@ -11,9 +11,12 @@ jupyterlabとmlflowを使って計算実行から結果の管理までを行い�
 + jupyterlab
 + SQLiteあるいはMySQLその他SQL DB
 + AWS S3などのオブジェクトストレージ（mlflowのartifact配置にオブジェクトストレージを使う場合）
++ slurm（ジョブキューイングを行う場合）
 
 mlflowとjupyterlabはPythonのvirtualenv環境で`pip install mlflow`, `pip install jupyterlab`でインストールします。
+slurmは`apt`コマンドでインストールします。
 
+>sudo apt install slurm-wlm
 
 ### AWS EC2環境の場合
 
@@ -24,6 +27,11 @@ EC2のセキュリティ設定でmyIPからのインバウンドを登録して�
 ssh -i <秘密鍵> -N -f -L 5000:localhost:5000 ubuntu@<EC2パブリックIP>
 
 AWS環境の時はmlflowのアーティファクトストレージをAWS S3に直接配置できます。
+
+slurmを使用する場合でhostnameを固定したい場合は以下で変更します。
+
+>sudo hostnamectl set-hostname <新しいホスト名>
+
 
 ## 構成
 
@@ -71,3 +79,8 @@ mlflowを以下でserver modeで起動しておきます。
 
 ノートブック中のmlflowのtracking URIを以下のように指定します。
 >MLFLOW_TRACKING_URI = "http://<サーバのIP>:5000"
+
+### slurmなどを使って計算ジョブをキューイングする場合
+
+`Batch.ipynb`のノートブックからジョブを投入します。
+最後のセルに`mlflow.end_run()`がありますが、正常にジョブ投入できている時は実行しないように注意。

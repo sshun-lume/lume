@@ -1,0 +1,53 @@
+import importlib
+import mlflow
+import os, sys, json
+
+
+RUN_SCRIPT = os.getenv("RUN_SCRIPT")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+RUN_NAME = os.getenv("RUN_NAME")
+ARCHIVE_COMMAND = os.getenv("ARCHIVE_COMMAND")
+mlflow_run_id = sys.argv[1]
+
+sim_params = json.loads(os.getenv("SIM_PARAMS"))
+dump_files = json.loads(os.getenv("DUMP_FILES"))
+
+##
+##
+##
+sim = importlib.import_module(f'scripts.{RUN_SCRIPT}')
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+
+
+mlflow_run = mlflow.start_run(
+    run_id=mlflow_run_id,
+    log_system_metrics=True)
+
+
+
+##
+## シミュレーション処理　シミュレーション初期化
+##
+sim.log_GPU_info(mlflow.log_params)
+mlflow.log_params(sim_params)
+sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
+
+##
+## シミュレーション処理　メインループ
+##
+archive = f'_{RUN_NAME}'
+sim.run(sim_params, mlflow.log_metrics, archive, dump_files[0])
+
+##
+## シミュレーション処理　結果の登録・保存
+##
+for dump_file in dump_files:
+    if dump_file:
+        os.system(f"{ARCHIVE_COMMAND} {dump_file}")
+        mlflow.log_artifact(f"{dump_file}.xz", artifact_path='dump')
+
+mlflow.log_artifact(archive, artifact_path='final_state')
+
+
+mlflow.end_run()
