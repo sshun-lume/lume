@@ -13,7 +13,7 @@ jupyterlabとmlflowを使って計算実行から結果の管理までを行い�
 + AWS S3などのオブジェクトストレージ（mlflowのartifact配置にオブジェクトストレージを使う場合）
 + slurm（ジョブキューイングを行う場合）
 
-mlflowとjupyterlabはPythonのvirtualenv環境で`pip install mlflow`, `pip install jupyterlab`でインストールします。
+mlflowとjupyterlabはPythonのvirtualenv環境で`pip install mlflow`, `pip install jupyterlab jupyterlab-git`でインストールします。
 slurmは`apt`コマンドでインストールします。
 
 >sudo apt install slurm-wlm
