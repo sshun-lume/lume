@@ -1,6 +1,7 @@
 import importlib
 import mlflow
 import os, sys, json
+from utils.info_utils import MLflowEnvLogger
 
 
 RUN_SCRIPT = os.getenv("RUN_SCRIPT")
@@ -29,8 +30,9 @@ try:
     ##
     ## シミュレーション処理　シミュレーション初期化
     ##
-    sim.log_GPU_info(mlflow.log_params)
+    sim.log_GPU_info(mlflow.set_tags)
     mlflow.log_params(sim_params)
+    mlflow.set_tags(MLflowEnvLogger.log_all_env_tags())
     
     if PREV_RUNID:
         prev_state_path = mlflow.artifacts.download_artifacts(
