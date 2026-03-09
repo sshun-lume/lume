@@ -49,10 +49,10 @@ try:
     ##
     ## シミュレーション処理　メインループ
     ##
-    archive = f'_{RUN_NAME}'
-    sim.run(sim_params, mlflow.log_metrics, archive, dump_files[0])
+    restart = f'restart.{RUN_NAME}'
+    sim.run(sim_params, mlflow.log_metrics, restart, dump_files[0])
 
-    mlflow.log_artifact(archive, artifact_path='final_state')
+    mlflow.log_artifact(restart, artifact_path='final_state')
 
 finally:
     ##
