@@ -23,8 +23,8 @@ default_prams = {
     "mu_solid": 1.0e5,
     "c_fluid": 1.5e3 / 2.0,     # 1500m/s = 1.5e5 cm/s (water)
     "c_solid": 5.44e3 / 2.0,    # 5440m/s (glass)
-    "deltaT": 0.000050,
-    "stepmax": 1.50,            # [s]
+    "delta_t": 0.000050,
+    "total_time": 1.50,            # [s]
     "intaval": 0.005,           # [s]
     "param_g": 9.8e2,           # [cm/s^2]
 }
@@ -215,11 +215,11 @@ def create_initial_state(params, log_params, dump_file):
 
 def run(params, log_metrics, serialization_file, dump_file):
 
-    deltaT = params["deltaT"]
-    stepmax_time = params["stepmax"]
+    deltaT = params["delta_t"]
+    total_time = params["total_time"]
     intaval_time = params["intaval"]
 
-    stepmax = int(stepmax_time / deltaT)
+    stepmax = int(total_time / deltaT)
     intaval = max(1, int(intaval_time / deltaT))
 
     param_g = params["param_g"]

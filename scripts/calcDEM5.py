@@ -25,7 +25,7 @@ default_prams = {
         "mu_r": 0.10,
     },
     "cutoff_block_factor": 0.9,
-    "stepmax": 1.50,
+    "total_time": 1.50,
     "intaval": 0.005,
     "initDeltaT": 0.000008,
     "ulim": 0.01 * 4,
@@ -175,7 +175,7 @@ def run(params, log_metrics, serialization_file, dump_file):
     particles[0].waitPutTMP()
 
 
-    stepmax  = params["stepmax"]
+    total_time  = params["total_time"]
     intaval  = params["intaval"]
     initstep = particles[0].timestep
     initDeltaT = params["initDeltaT"]
@@ -192,7 +192,7 @@ def run(params, log_metrics, serialization_file, dump_file):
     thistime.statOutput = True
 
     thistime.PrintStat(0)
-    print("End Time: ", stepmax, file=sys.stderr)
+    print("End Time: ", total_time, file=sys.stderr)
 
     for i in range(ndev):
         particles.setGPU(i)
@@ -202,7 +202,7 @@ def run(params, log_metrics, serialization_file, dump_file):
     j = 0
     start_time = time.time()
 
-    while thistime() <stepmax:
+    while thistime() < total_time:
         if thistime.isRollbacking():
             print("now rollbacking:", end="", file=sys.stderr)
 
