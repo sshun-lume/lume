@@ -1,4 +1,5 @@
 from lammps import lammps
+import math
 lmp = lammps()
 
 default_prams = {
@@ -25,13 +26,13 @@ def create_initial_state(params, log_params, dump_file):
     lmp.command(f"read_data {params['data_dir']}/{params['data_file']}")
 
     lmp.command(f"variable ThermoStep world {params['thermo_step']}")
+    lmp.command(f"variable DumpFile world {dump_file}")
 
     lmp.file(f"{params['data_dir']}/{params['input_file']}")
-    lmp.command(f"dump 1 all custom 100 {dump_file}.* id type xs ys zs ix iy iz vx vy vz fx fy fz")
 
 
 def run(params, log_metrics, restart_file, dump_file):
-    iter = int(params['run_steps'] / params['thermo_step'])
+    iter = math.ceil(params['run_steps'] / params['thermo_step'])
     for i in range(iter):
         lmp.command(f"run {params['thermo_step']}")
         thermo = lmp.last_thermo()
