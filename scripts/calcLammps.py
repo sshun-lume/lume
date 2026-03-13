@@ -1,5 +1,6 @@
 from lammps import lammps
 import math
+import os, glob
 lmp = lammps()
 
 default_prams = {
@@ -21,10 +22,8 @@ def load_previous_state(prev_state):
 
 def create_initial_state(params, log_params, dump_file):
     lmp.command(f"log log.{params['log_file']}")
-    lmp.command(f"units {params['units']}")
-    lmp.command(f"atom_style {params['atom_style']}")
-    lmp.command(f"read_data {params['data_dir']}/{params['data_file']}")
 
+    lmp.command(f"variable DataFile world {params['data_dir']}/{params['data_file']}")
     lmp.command(f"variable ThermoStep world {params['thermo_step']}")
     lmp.command(f"variable DumpFile world {dump_file}")
 
@@ -39,3 +38,25 @@ def run(params, log_metrics, restart_file, dump_file):
         log_metrics(thermo, step=(i+1)*params['thermo_step'])
 
     lmp.command(f"write_restart {restart_file}")
+
+def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
+    if recipe['snapshots']:
+        for snapshot in recipe['snapshots']:
+            for snapshot_file in glob.glob(f"{snapshot}.*"):
+                if snapshot_file.endswith('.xz'):
+                    continue
+                os.system(f"{archive_command} {snapshot_file}")
+                log_artifact(f"{snapshot_file}.xz", artifact_path='snapshots')
+            if cleanup:
+                os.system(f"rm -f {snapshot}.*")
+    
+    if recipe['log']:
+        log_artifact(f'{recipe["log"]}', artifact_path='log')
+        if cleanup:
+            os.system(f"rm -f {recipe["log"]}")
+        
+    if recipe['restarts']:
+        for restart in recipe['restarts']:
+            log_artifact(restart, artifact_path='restarts')
+            if cleanup:
+                os.system(f"rm -f {restart}")
