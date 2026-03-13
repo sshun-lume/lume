@@ -13,6 +13,7 @@ mlflow_run_id = sys.argv[1]
 
 sim_params = json.loads(os.getenv("SIM_PARAMS"))
 dump_files = json.loads(os.getenv("DUMP_FILES"))
+snapshots = os.getenv("SNAPSHOTS")
 
 ##
 ##
@@ -44,24 +45,26 @@ try:
         os.system(f"rm -rf {prev_state_path}")
         mlflow.log_param("prev_run_id", PREV_RUNID)
     else:
-        sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
+        sim.create_initial_state(sim_params, mlflow.log_params, snapshots)
 
     ##
     ## シミュレーション処理　メインループ
     ##
     restart = f'restart.{RUN_NAME}'
-    sim.run(sim_params, mlflow.log_metrics, restart, dump_files[0])
-
-    mlflow.log_artifact(restart, artifact_path='final_state')
+    sim.run(sim_params, mlflow.log_metrics, restart, dump_files)
 
 finally:
     ##
     ## シミュレーション処理　結果の登録・保存
     ##
-    for dump_file in dump_files:
-        if dump_file:
-            os.system(f"{ARCHIVE_COMMAND} {dump_file}")
-            mlflow.log_artifact(f"{dump_file}.xz", artifact_path='dump')
+    recipe = {
+        "dumpfiles": dump_files,
+        "snapshots": [snapshots],
+        "log": f'log.{sim_params["log_file"]}',
+        "restarts": [restart],
+    }
+
+    sim.store_artifacts(recipe, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
 
 mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
 mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
