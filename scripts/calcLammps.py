@@ -20,12 +20,12 @@ def log_GPU_info(log_params):
 def load_previous_state(prev_state):
     pass
 
-def create_initial_state(params, log_params, dump_file):
+def create_initial_state(params, log_params, snapshot_file):
     lmp.command(f"log log.{params['log_file']}")
 
     lmp.command(f"variable DataFile world {params['data_dir']}/{params['data_file']}")
     lmp.command(f"variable ThermoStep world {params['thermo_step']}")
-    lmp.command(f"variable DumpFile world {dump_file}")
+    lmp.command(f"variable Snapshot world {snapshot_file}")
 
     lmp.file(f"{params['data_dir']}/{params['input_file']}")
 
@@ -60,3 +60,10 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
             log_artifact(restart, artifact_path='restarts')
             if cleanup:
                 os.system(f"rm -f {restart}")
+
+    if recipe['dumpfiles']:
+        for dumpfile in recipe['dumpfiles']:
+                os.system(f"{archive_command} {dumpfile}")
+                log_artifact(f"{dumpfile}.xz", artifact_path='dumpfiles')
+                if cleanup:
+                    os.system(f"rm -f {dumpfile}.xz")
