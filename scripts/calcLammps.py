@@ -3,8 +3,6 @@ import math
 import os, glob
 
 default_prams = {
-    "units": "lj",
-    "atom_style": "molecular",
     "data_file": "data.lmp",
     "input_file": "in.lmp",
     "log_file": "lammps",
