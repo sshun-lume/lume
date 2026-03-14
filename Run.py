@@ -2,6 +2,10 @@ import importlib
 import mlflow
 import os, sys, json
 from utils.info_utils import MLflowEnvLogger
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
 
 
 RUN_SCRIPT = os.getenv("RUN_SCRIPT")
@@ -14,6 +18,10 @@ mlflow_run_id = sys.argv[1]
 sim_params = json.loads(os.getenv("SIM_PARAMS"))
 dump_files = json.loads(os.getenv("DUMP_FILES"))
 snapshots = os.getenv("SNAPSHOTS")
+restart_files = json.loads(os.getenv("RESTART_FILES"))
+
+restart = f'restart.{RUN_NAME}'
+restart_files.append(restart)
 
 ##
 ##
@@ -31,10 +39,17 @@ try:
     ##
     ## シミュレーション処理　シミュレーション初期化
     ##
-    sim.log_GPU_info(mlflow.set_tags)
-    mlflow.log_params(sim_params)
-    mlflow.set_tags(MLflowEnvLogger.log_all_env_tags())
-    
+    if rank == 0:
+        sim.log_GPU_info(mlflow.set_tags)
+        mlflow.log_params(sim_params)
+        mlflow.set_tags(MLflowEnvLogger.log_all_env_tags())
+
+        mlflow.log_params({
+            "dump_files": dump_files,
+            "snapshots": snapshots,
+            "restart_files": restart_files,
+        })
+
     if PREV_RUNID:
         prev_state_path = mlflow.artifacts.download_artifacts(
             run_id=PREV_RUNID,
@@ -50,7 +65,6 @@ try:
     ##
     ## シミュレーション処理　メインループ
     ##
-    restart = f'restart.{RUN_NAME}'
     sim.run(sim_params, mlflow.log_metrics, restart, dump_files)
 
 finally:
@@ -61,12 +75,14 @@ finally:
         "dumpfiles": dump_files,
         "snapshots": [snapshots],
         "log": f'log.{sim_params["log_file"]}',
-        "restarts": [restart],
+        "restarts": restart_files,
     }
 
-    sim.store_artifacts(recipe, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
+    if rank == 0:
+        sim.store_artifacts(recipe, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
 
-mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
-mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
+if rank == 0:
+    mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
+    mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
 
-mlflow.end_run()
+    mlflow.end_run()
