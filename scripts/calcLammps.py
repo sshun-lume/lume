@@ -1,7 +1,6 @@
 from lammps import lammps
 import math
 import os, glob
-lmp = lammps()
 
 default_prams = {
     "units": "lj",
@@ -18,9 +17,13 @@ def log_GPU_info(log_params):
     pass
 
 def load_previous_state(prev_state):
+    global lmp
+    lmp = lammps()
     pass
 
 def create_initial_state(params, log_params, snapshot_file):
+    global lmp
+    lmp = lammps()
     lmp.command(f"log log.{params['log_file']}")
 
     lmp.command(f"variable DataFile world {params['data_dir']}/{params['data_file']}")
@@ -31,11 +34,17 @@ def create_initial_state(params, log_params, snapshot_file):
 
 
 def run(params, log_metrics, restart_file, dump_file):
+    from mpi4py import MPI
+
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+
     iter = math.ceil(params['run_steps'] / params['thermo_step'])
     for i in range(iter):
         lmp.command(f"run {params['thermo_step']}")
         thermo = lmp.last_thermo()
-        log_metrics(thermo, step=(i+1)*params['thermo_step'])
+        if rank == 0:
+            log_metrics(thermo, step=(i+1)*params['thermo_step'])
 
     lmp.command(f"write_restart {restart_file}")
 
