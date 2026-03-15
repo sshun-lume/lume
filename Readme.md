@@ -69,6 +69,8 @@ mlflowのexperimentごとにアーティファクトストレージを設定で�
 
 この場合はEC2からS3への書き込み権限が必要です
 
+環境変数`S3STORAGEBUCKET`から読んでいるので適宜設定してください。
+
 #### S3への書き込み権限を計算を行うEC2インスタンスに与える手順
 
 1. 「IAM > ポリシー」で`ポリシーの作成`を行う
@@ -87,7 +89,7 @@ mlflowのexperimentごとにアーティファクトストレージを設定で�
 ### 2台以上で構成する場合（mlflowをserver modeで起動する場合）
 
 mlflowを以下でserver modeで起動しておきます。
->mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlserver/mlflow.db
+>mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlruns/mlflow.db
 
 ノートブック中のmlflowのtracking URIを以下のように指定します。
 >MLFLOW_TRACKING_URI = "http://<サーバのIP>:5000"
