@@ -1,6 +1,5 @@
 from lammps import lammps
 import math
-import os, glob
 
 default_prams = {
     "data_file": "data.lmp",
@@ -47,7 +46,8 @@ def run(params, log_metrics, restart_file, dump_file):
     lmp.command(f"write_restart {restart_file}")
 
 def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
-    if recipe['snapshots']:
+    import os, glob
+    if 'snapshots' in recipe:
         for snapshot in recipe['snapshots']:
             for snapshot_file in glob.glob(f"{snapshot}.*"):
                 if snapshot_file.endswith('.xz'):
@@ -57,20 +57,23 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
             if cleanup:
                 os.system(f"rm -f {snapshot}.*")
     
-    if recipe['log']:
+    if 'log' in recipe:
         log_artifact(f'{recipe["log"]}', artifact_path='log')
         if cleanup:
             os.system(f"rm -f {recipe["log"]}")
         
-    if recipe['restarts']:
+    if 'restarts' in recipe:
         for restart in recipe['restarts']:
             log_artifact(restart, artifact_path='restarts')
             if cleanup:
                 os.system(f"rm -f {restart}")
 
-    if recipe['dumpfiles']:
+    if 'dumpfiles' in recipe:
         for dumpfile in recipe['dumpfiles']:
+            try:
                 os.system(f"{archive_command} {dumpfile}")
                 log_artifact(f"{dumpfile}.xz", artifact_path='dumpfiles')
                 if cleanup:
                     os.system(f"rm -f {dumpfile}.xz")
+            except:
+                pass

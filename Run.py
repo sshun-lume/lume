@@ -60,7 +60,7 @@ try:
         os.system(f"rm -rf {prev_state_path}")
         mlflow.log_param("prev_run_id", PREV_RUNID)
     else:
-        sim.create_initial_state(sim_params, mlflow.log_params, snapshots)
+        sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
 
     ##
     ## シミュレーション処理　メインループ
@@ -74,9 +74,10 @@ finally:
     recipe = {
         "dumpfiles": dump_files,
         "snapshots": [snapshots],
-        "log": f'log.{sim_params["log_file"]}',
         "restarts": restart_files,
     }
+    if "log_file" in sim_params:
+        recipe.update({"log": f'log.{sim_params["log_file"]}'})
 
     if rank == 0:
         sim.store_artifacts(recipe, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
