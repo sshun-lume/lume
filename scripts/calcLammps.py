@@ -6,7 +6,9 @@ default_prams = {
     "input_file": "in.lmp",
     "log_file": "lammps",
     "data_dir": "data",
+    "delta_t": 1.0,
     "thermo_step": 100,
+    "dump_step": 100,
     "run_steps": 100,
 }
 
@@ -18,9 +20,11 @@ def load_previous_state(params, prev_state):
     lmp = lammps()
     lmp.command(f"log log.{params['log_file']}")
 
+    lmp.command(f"variable        DeltaT world {params['delta_t']}")
     lmp.command(f"variable RestartFrom world {prev_state}")
     
     lmp.command(f"variable ThermoStep world {params['thermo_step']}")
+    lmp.command(f"variable DumpStep world {params['dump_step']}")
 
     lmp.file(f"{params['data_dir']}/{params['input_file']}")
 
@@ -29,8 +33,11 @@ def create_initial_state(params, log_params, snapshot_file):
     lmp = lammps()
     lmp.command(f"log log.{params['log_file']}")
 
+    lmp.command(f"variable        DeltaT world {params['delta_t']}")
     lmp.command(f"variable DataFile world {params['data_dir']}/{params['data_file']}")
+
     lmp.command(f"variable ThermoStep world {params['thermo_step']}")
+    lmp.command(f"variable DumpStep world {params['dump_step']}")
     lmp.command(f"variable Snapshot world {snapshot_file}")
 
     lmp.file(f"{params['data_dir']}/{params['input_file']}")
