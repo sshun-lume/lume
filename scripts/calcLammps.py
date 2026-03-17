@@ -62,14 +62,15 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
     import os, glob
     if 'snapshots' in recipe:
         for snapshot in recipe['snapshots']:
-            for snapshot_file in glob.glob(f"{snapshot}.*"):
-                if snapshot_file.endswith('.xz'):
-                    continue
-                os.system(f"{archive_command} {snapshot_file}")
-                log_artifact(f"{snapshot_file}.xz", artifact_path='snapshots')
-            if cleanup:
-                os.system(f"rm -f {snapshot}.*")
-    
+            if snapshot != "" and snapshot != None:
+                for snapshot_file in glob.glob(f"{snapshot}.*"):
+                    if snapshot_file.endswith('.xz'):
+                        continue
+                    os.system(f"{archive_command} {snapshot_file}")
+                    log_artifact(f"{snapshot_file}.xz", artifact_path='snapshots')
+                if cleanup:
+                    os.system(f"rm -f {snapshot}.*")
+
     if 'log' in recipe:
         log_artifact(f'{recipe["log"]}', artifact_path='log')
         if cleanup:
