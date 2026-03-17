@@ -13,6 +13,7 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 RUN_NAME = os.getenv("RUN_NAME")
 ARCHIVE_COMMAND = os.getenv("ARCHIVE_COMMAND")
 PREV_RUNID = os.getenv("PREV_RUNID")
+RESTART_FROM = os.getenv("RESTART_FROM")
 mlflow_run_id = sys.argv[1]
 
 sim_params = json.loads(os.getenv("SIM_PARAMS"))
@@ -53,10 +54,16 @@ try:
     if PREV_RUNID:
         prev_state_path = mlflow.artifacts.download_artifacts(
             run_id=PREV_RUNID,
-            artifact_path="final_state",    # 取得したいアーティファクト内のパス
+            artifact_path="restarts",    # 取得したいアーティファクト内のパス
         )
         files = os.listdir(prev_state_path)
-        sim.load_previous_state(f'{prev_state_path}/{files[0]}')
+        if RESTART_FROM != '':
+            RESTART_FILE = RESTART_FROM
+        elif len(files) > 0:
+            RESTART_FILE = files[0]
+        else:
+            sys.exit(0)
+        sim.load_previous_state(sim_params, f'{prev_state_path}/{RESTART_FILE}')
         os.system(f"rm -rf {prev_state_path}")
         mlflow.log_param("prev_run_id", PREV_RUNID)
     else:

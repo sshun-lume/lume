@@ -13,10 +13,16 @@ default_prams = {
 def log_GPU_info(log_params):
     pass
 
-def load_previous_state(prev_state):
+def load_previous_state(params, prev_state):
     global lmp
     lmp = lammps()
-    pass
+    lmp.command(f"log log.{params['log_file']}")
+
+    lmp.command(f"variable RestartFrom world {prev_state}")
+    
+    lmp.command(f"variable ThermoStep world {params['thermo_step']}")
+
+    lmp.file(f"{params['data_dir']}/{params['input_file']}")
 
 def create_initial_state(params, log_params, snapshot_file):
     global lmp
