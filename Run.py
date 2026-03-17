@@ -70,7 +70,8 @@ try:
             sys.exit(0)
         sim.load_previous_state(sim_params, f'{prev_state_path}/{RESTART_FILE}')
         os.system(f"rm -rf {prev_state_path}")
-        mlflow.log_param("prev_run_id", PREV_RUNID)
+        if rank == 0:
+            mlflow.set_tag("PREV_RUNID", PREV_RUNID)
     else:
         sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
 
