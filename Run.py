@@ -43,6 +43,11 @@ try:
     if rank == 0:
         sim.log_GPU_info(mlflow.set_tags)
         mlflow.log_params(sim_params)
+        mlflow.log_params({
+            "dump_files": dump_files,
+            "snapshots": snapshots,
+            "restart_files": restart_files,
+        })
         mlflow.set_tags(MLflowEnvLogger.log_all_env_tags())
 
         mlflow.log_params({
