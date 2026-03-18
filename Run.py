@@ -84,16 +84,16 @@ finally:
     ##
     ## シミュレーション処理　結果の登録・保存
     ##
-    recipe = {
+    artifacts = {
         "dumpfiles": dump_files,
         "snapshots": [snapshots],
         "restarts": restart_files,
     }
     if "log_file" in sim_params:
-        recipe.update({"log": f'log.{sim_params["log_file"]}'})
+        artifacts.update({"log": f'log.{sim_params["log_file"]}'})
 
     if rank == 0:
-        sim.store_artifacts(recipe, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
+        sim.store_artifacts(artifacts, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
 
 if rank == 0:
     mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')

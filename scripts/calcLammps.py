@@ -58,10 +58,10 @@ def run(params, log_metrics, restart_file, dump_file):
 
     lmp.command(f"write_restart {restart_file}")
 
-def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
+def store_artifacts(artifacts, log_artifact, archive_command, cleanup=False):
     import os, glob
-    if 'snapshots' in recipe:
-        for snapshot in recipe['snapshots']:
+    if 'snapshots' in artifacts:
+        for snapshot in artifacts['snapshots']:
             if snapshot != "" and snapshot != None:
                 for snapshot_file in glob.glob(f"{snapshot}.*"):
                     if snapshot_file.endswith('.xz'):
@@ -71,19 +71,19 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
                 if cleanup:
                     os.system(f"rm -f {snapshot}.*")
 
-    if 'log' in recipe:
-        log_artifact(f'{recipe["log"]}', artifact_path='log')
+    if 'log' in artifacts:
+        log_artifact(f'{artifacts["log"]}', artifact_path='log')
         if cleanup:
-            os.system(f"rm -f {recipe["log"]}")
+            os.system(f"rm -f {artifacts["log"]}")
         
-    if 'restarts' in recipe:
-        for restart in recipe['restarts']:
+    if 'restarts' in artifacts:
+        for restart in artifacts['restarts']:
             log_artifact(restart, artifact_path='restarts')
             if cleanup:
                 os.system(f"rm -f {restart}")
 
-    if 'dumpfiles' in recipe:
-        for dumpfile in recipe['dumpfiles']:
+    if 'dumpfiles' in artifacts:
+        for dumpfile in artifacts['dumpfiles']:
             try:
                 os.system(f"{archive_command} {dumpfile}")
                 log_artifact(f"{dumpfile}.xz", artifact_path='dumpfiles')
