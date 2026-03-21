@@ -50,12 +50,6 @@ try:
         })
         mlflow.set_tags(MLflowEnvLogger.log_all_env_tags())
 
-        mlflow.log_params({
-            "dump_files": dump_files,
-            "snapshots": snapshots,
-            "restart_files": restart_files,
-        })
-
     if PREV_RUNID:
         prev_state_path = mlflow.artifacts.download_artifacts(
             run_id=PREV_RUNID,
