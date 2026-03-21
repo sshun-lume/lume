@@ -10,6 +10,8 @@ default_prams = {
     "thermo_step": 100,
     "dump_step": 100,
     "run_steps": 100,
+    "lmp_suffix": "off",    # "gpu", "omp", "opt"
+    "pk_num": 1,
 }
 
 def log_GPU_info(log_params):
@@ -19,6 +21,10 @@ def load_previous_state(params, prev_state):
     global lmp
     lmp = lammps()
     lmp.command(f"log log.{params['log_file']}")
+    if params["lmp_suffix"] != "off":
+        lmp.command(f"suffix {params["lmp_suffix"]}")
+        if params["lmp_suffix"] != "opt":
+            lmp.command(f"package {params["lmp_suffix"]} {params["pk_num"]}")
 
     lmp.command(f"variable        DeltaT world {params['delta_t']}")
     lmp.command(f"variable RestartFrom world {prev_state}")
@@ -32,6 +38,10 @@ def create_initial_state(params, log_params, snapshot_file):
     global lmp
     lmp = lammps()
     lmp.command(f"log log.{params['log_file']}")
+    if params["lmp_suffix"] != "off":
+        lmp.command(f"suffix {params["lmp_suffix"]}")
+        if params["lmp_suffix"] != "opt":
+            lmp.command(f"package {params["lmp_suffix"]} {params["pk_num"]}")
 
     lmp.command(f"variable        DeltaT world {params['delta_t']}")
     lmp.command(f"variable DataFile world {params['data_dir']}/{params['data_file']}")
