@@ -20,6 +20,7 @@ sim_params = json.loads(os.getenv("SIM_PARAMS"))
 dump_files = json.loads(os.getenv("DUMP_FILES"))
 snapshots = os.getenv("SNAPSHOTS")
 restart_files = json.loads(os.getenv("RESTART_FILES"))
+artifacts_cleanup = os.getenv("ARTIFACTS_CLEANUP") == "True"
 
 restart = f'restart.{RUN_NAME}'
 restart_files.append(restart)
@@ -87,7 +88,7 @@ finally:
         artifacts.update({"log": f'log.{sim_params["log_file"]}'})
 
     if rank == 0:
-        sim.store_artifacts(artifacts, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=True)
+        sim.store_artifacts(artifacts, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=artifacts_cleanup)
 
 if rank == 0:
     mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
