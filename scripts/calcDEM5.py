@@ -166,11 +166,11 @@ def create_initial_state(params, log_params, dump_file):
         particles[i].calcBlockID()
 
 
-def run(params, log_metrics, serialization_file, dump_file):
+def run(params, log_metrics, serialization_file, dump_files):
 
     particles[0].getSelectedTypeID()
     particles[0].getSelectedPosition()
-    particles[0].openTMP(dump_file)
+    particles[0].openTMP(dump_files[0])
     particles[0].putTMPtoO()
     particles[0].waitPutTMP()
 
@@ -258,3 +258,36 @@ def run(params, log_metrics, serialization_file, dump_file):
 
     particles.writeSerialization(serialization_file)
     print("Done.")
+
+def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
+    import os, glob
+    if 'snapshots' in recipe:
+        for snapshot in recipe['snapshots']:
+            for snapshot_file in glob.glob(f"{snapshot}.*"):
+                if snapshot_file.endswith('.xz'):
+                    continue
+                os.system(f"{archive_command} {snapshot_file}")
+                log_artifact(f"{snapshot_file}.xz", artifact_path='snapshots')
+            if cleanup:
+                os.system(f"rm -f {snapshot}.*")
+    
+    if 'log' in recipe:
+        log_artifact(f'{recipe["log"]}', artifact_path='log')
+        if cleanup:
+            os.system(f"rm -f {recipe["log"]}")
+        
+    if 'restarts' in recipe:
+        for restart in recipe['restarts']:
+            log_artifact(restart, artifact_path='restarts')
+            if cleanup:
+                os.system(f"rm -f {restart}")
+
+    if 'dumpfiles' in recipe:
+        for dumpfile in recipe['dumpfiles']:
+            try:
+                os.system(f"{archive_command} {dumpfile}")
+                log_artifact(f"{dumpfile}.xz", artifact_path='dumpfiles')
+                if cleanup:
+                    os.system(f"rm -f {dumpfile}.xz")
+            except:
+                pass

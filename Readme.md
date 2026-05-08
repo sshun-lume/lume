@@ -69,6 +69,8 @@ mlflowのexperimentごとにアーティファクトストレージを設定で�
 
 この場合はEC2からS3への書き込み権限が必要です
 
+環境変数`S3STORAGEBUCKET`から読んでいるので適宜設定してください。
+
 #### S3への書き込み権限を計算を行うEC2インスタンスに与える手順
 
 1. 「IAM > ポリシー」で`ポリシーの作成`を行う
@@ -87,7 +89,7 @@ mlflowのexperimentごとにアーティファクトストレージを設定で�
 ### 2台以上で構成する場合（mlflowをserver modeで起動する場合）
 
 mlflowを以下でserver modeで起動しておきます。
->mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlserver/mlflow.db
+>mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////path/to/mlruns/mlflow.db
 
 ノートブック中のmlflowのtracking URIを以下のように指定します。
 >MLFLOW_TRACKING_URI = "http://<サーバのIP>:5000"
@@ -98,8 +100,36 @@ mlflowを以下でserver modeで起動しておきます。
 最後のセルに`mlflow.end_run()`がありますが、正常にジョブ投入できている時は実行しないように注意。
 
 
-## その他 - 注意
+## ファイルの説明
 
-`scripts/`以下のファイルは基本的にサンプルです。
-何をどう記述する必要があるかを伝えるために残してありますが、本体部分のコードがないので動作しません。
+### Run.ipynb
 
+シミュレーション計算を行うためのノートブックです。
+シミュレーションのコア部分もノートブックのipykernelで実行します。
+長時間の計算や並列計算などはできません。
+
+### Batch.ipynb
+
+slurmのsbatchコマンドを使ってシミュレーション計算をキューイングするノートブックです。
+並列計算や他のノードでの計算も可能になります。
+
+### Run.py
+
+シミュレーション計算をキューイングしてバッチ実行する時の本体scriptになります。
+基本的に`Run.ipynb`と同じことをやっています。
+
+### scripts/calcLammps.py
+
+Lume経由でLammpsを実行する時のパラメータ定義・初期化・メトリックを取得しながらの計算実行・生成ファイルのmlflow artifact処理などを実装しています。
+
+Lammps以外のシミュレータをLumeから使いたい時は、ここで個別対応を実装してください。
+
+
+### `utils/` 以下
+
+mlflowに登録する情報を取得するなどのユーティリティ関数です。
+
+### `data/` 以下
+
+lammpsの計算実行に必要なinputファイルやdataファイルを置いています。
+`sim_params["data_dir"]` で指定し`calcLammps.py`でLammpsに読み込ませています。
