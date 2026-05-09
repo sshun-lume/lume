@@ -68,7 +68,7 @@ try:
         if rank == 0:
             mlflow.set_tag("PREV_RUNID", PREV_RUNID)
     else:
-        sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
+        sim.create_initial_state(sim_params, mlflow.log_params, snapshots)
 
     ##
     ## シミュレーション処理　メインループ
