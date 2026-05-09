@@ -10,7 +10,7 @@ default_prams = {
     "thermo_step": 100,
     "dump_step": 100,
     "run_steps": 100,
-    "lmp_suffix": "off",    # "gpu", "omp", "opt"
+    "lmp_suffix": "opt",    # "gpu", "omp", "opt", "off"
     "pk_num": 1,
 }
 
