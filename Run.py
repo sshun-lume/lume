@@ -37,6 +37,8 @@ mlflow_run = mlflow.start_run(
     run_id=mlflow_run_id,
     log_system_metrics=True)
 
+end_status = 'SUCCESS'
+
 try:
     ##
     ## シミュレーション処理　シミュレーション初期化
@@ -79,7 +81,7 @@ except BaseException as e:
     print("exception caught")
     print(type(e))
     if rank == 0:
-        mlflow.end_run(status='FAILED')
+        end_status = 'FAILED'
         print("Exception: ", e)
 
 finally:
@@ -102,4 +104,4 @@ if rank == 0:
     mlflow.log_artifact(f'{RUN_NAME}.out.txt', artifact_path='output')
     mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
 
-    mlflow.end_run()
+    mlflow.end_run(status=end_status)
