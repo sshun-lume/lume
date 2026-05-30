@@ -7,7 +7,7 @@ mlflow_run_id = sys.argv[1]
 
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
-mlflow.log_artifact(f'{os.getenv("RUN_NAME")}.out', artifact_path='output', run_id=mlflow_run_id)
+mlflow.log_artifact(f'{os.getenv("RUN_NAME")}.out.txt', artifact_path='output', run_id=mlflow_run_id)
 mlflow.log_artifact(f'{os.getenv("RUN_NAME")}.err', artifact_path='output', run_id=mlflow_run_id)
 
 artifacts = {
