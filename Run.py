@@ -99,7 +99,7 @@ finally:
         sim.store_artifacts(artifacts, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=artifacts_cleanup)
 
 if rank == 0:
-    mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
+    mlflow.log_artifact(f'{RUN_NAME}.out.txt', artifact_path='output')
     mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
 
     mlflow.end_run()
