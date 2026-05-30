@@ -75,7 +75,15 @@ try:
     ##
     sim.run(sim_params, mlflow.log_metrics, restart, dump_files)
 
+except BaseException as e:
+    print("exception caught")
+    print(type(e))
+    if rank == 0:
+        mlflow.end_run(status='FAILED')
+        print("Exception: ", e)
+
 finally:
+    print("finally closing")
     ##
     ## シミュレーション処理　結果の登録・保存
     ##
