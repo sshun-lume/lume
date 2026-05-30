@@ -278,9 +278,10 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
         
     if 'restarts' in recipe:
         for restart in recipe['restarts']:
-            log_artifact(restart, artifact_path='restarts')
-            if cleanup:
-                os.system(f"rm -f {restart}")
+            if restart != "" and restart != None and os.path.exists(restart):
+                log_artifact(restart, artifact_path='restarts')
+                if cleanup:
+                    os.system(f"rm -f {restart}")
 
     if 'dumpfiles' in recipe:
         for dumpfile in recipe['dumpfiles']:
