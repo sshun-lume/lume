@@ -37,7 +37,7 @@ mlflow_run = mlflow.start_run(
     run_id=mlflow_run_id,
     log_system_metrics=True)
 
-end_status = 'SUCCESS'
+end_status = 'FINISHED'
 
 try:
     ##
