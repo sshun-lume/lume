@@ -43,7 +43,7 @@ def log_GPU_info(log_params):
             f"GPU_{i}_shMem": f'{particles.getShMem() /1024} [KB]',
         })
 
-def load_previous_state(prev_state):
+def load_previous_state(_, prev_state):
     particles.setup()
     particles.readSerialization(prev_state)
 
