@@ -11,6 +11,11 @@ particles = cudaParticles.CudaParticleDEM()
 ## GPU device数
 ndev = particles.nDevices()
 
+
+## 下で使う計算変数
+e = 0.85
+_gamma = - math.log(e) / math.sqrt(math.pi*math.pi + math.log(e)*math.log(e)) * 2;
+
 ## units used in this simulation are
 ## [g][cm][s]
 default_prams = {
@@ -21,7 +26,7 @@ default_prams = {
         "E": 2.11e10,
         "mu": 0.40,
         "sigma": 0.29,
-        "gamma": 0.10332,
+        "gamma": _gamma,
         "mu_r": 0.10,
     },
     "cutoff_block_factor": 0.9,
@@ -46,7 +51,7 @@ def log_GPU_info(log_params):
             f"GPU_{i}_shMem": f'{particles.getShMem() /1024} [KB]',
         })
 
-def load_previous_state(prev_state):
+def load_previous_state(_, prev_state):
     particles.setup()
     particles.readSerialization(prev_state)
 
@@ -278,9 +283,10 @@ def store_artifacts(recipe, log_artifact, archive_command, cleanup=False):
         
     if 'restarts' in recipe:
         for restart in recipe['restarts']:
-            log_artifact(restart, artifact_path='restarts')
-            if cleanup:
-                os.system(f"rm -f {restart}")
+            if restart != "" and restart != None and os.path.exists(restart):
+                log_artifact(restart, artifact_path='restarts')
+                if cleanup:
+                    os.system(f"rm -f {restart}")
 
     if 'dumpfiles' in recipe:
         for dumpfile in recipe['dumpfiles']:

@@ -37,6 +37,8 @@ mlflow_run = mlflow.start_run(
     run_id=mlflow_run_id,
     log_system_metrics=True)
 
+end_status = 'FINISHED'
+
 try:
     ##
     ## シミュレーション処理　シミュレーション初期化
@@ -68,14 +70,22 @@ try:
         if rank == 0:
             mlflow.set_tag("PREV_RUNID", PREV_RUNID)
     else:
-        sim.create_initial_state(sim_params, mlflow.log_params, dump_files[1])
+        sim.create_initial_state(sim_params, mlflow.log_params, snapshots)
 
     ##
     ## シミュレーション処理　メインループ
     ##
     sim.run(sim_params, mlflow.log_metrics, restart, dump_files)
 
+except BaseException as e:
+    print("exception caught")
+    print(type(e))
+    if rank == 0:
+        end_status = 'FAILED'
+        print("Exception: ", e)
+
 finally:
+    print("finally closing")
     ##
     ## シミュレーション処理　結果の登録・保存
     ##
@@ -91,7 +101,7 @@ finally:
         sim.store_artifacts(artifacts, mlflow.log_artifact, f"{ARCHIVE_COMMAND} -t", cleanup=artifacts_cleanup)
 
 if rank == 0:
-    mlflow.log_artifact(f'{RUN_NAME}.out', artifact_path='output')
+    mlflow.log_artifact(f'{RUN_NAME}.out.txt', artifact_path='output')
     mlflow.log_artifact(f'{RUN_NAME}.err', artifact_path='output')
 
-    mlflow.end_run()
+    mlflow.end_run(status=end_status)
