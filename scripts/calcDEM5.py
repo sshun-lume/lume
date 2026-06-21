@@ -146,6 +146,7 @@ def create_initial_state(params, log_params, dump_file):
         particles[i].setCell(cell)
 
         particles[i]._import(G1)
+        particles[i].autotunetimestep = True
 
         particles[i].setDEMProperties(DP['E'], DP['mu'], DP['sigma'], DP['gamma'], DP['mu_r'], R0)
         particles[i].setInertia(R0)
