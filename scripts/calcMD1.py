@@ -250,7 +250,7 @@ def run(params, log_metrics, serialization_file, dump_files):
                     "kinetic_energy": K,
                     "potential_energy": P,
                     "temperature": _temp,
-                    "elapsed_time": time.time() - start_time,
+                    "calculation_time": time.time() - start_time,
                     "time": (j + 1 + initstep) * delta_t,
                 }, step=j + 1)
 
@@ -263,6 +263,18 @@ def run(params, log_metrics, serialization_file, dump_files):
     if dump_file:
         particles[0].waitPutTMP()
         particles[0].closeTMP()
+
+    K = particles[0].calcKineticE()
+    P = particles[0].calcPotentialE()
+
+    if log_metrics is not None:
+        log_metrics({
+        "kinetic_energy": K,
+        "potential_energy": P,
+        "temperature": _temp,
+        "calculation_time": time.time() - start_time,
+        "time": (stepnum + initstep) * delta_t,
+    }, step=stepnum)
 
     particles.writeSerialization(serialization_file)
     print("Done.", file=sys.stderr)

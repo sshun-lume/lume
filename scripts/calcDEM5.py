@@ -215,7 +215,7 @@ def run(params, log_metrics, serialization_file, dump_files):
         if j % 50 == 0:
             print(j, end=" ", file=sys.stderr)
             log_metrics({
-                "elapsed_time": time.time() - start_time,
+                "calculation_time": time.time() - start_time,
                 "time": thistime(),
                 "delta_t": thistime.currentDeltaT(),
             }, step=j)
@@ -257,7 +257,7 @@ def run(params, log_metrics, serialization_file, dump_files):
     particles[0].waitPutTMP()
     thistime.PrintStat(j)
     log_metrics({
-        "elapsed_time": time.time() - start_time,
+        "calculation_time": time.time() - start_time,
         "time": thistime(),
         "delta_t": thistime.currentDeltaT(),
     }, step=j)
