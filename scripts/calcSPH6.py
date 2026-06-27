@@ -246,7 +246,7 @@ def run(params, log_metrics, serialization_file, dump_files):
             print(j, end=" ", file=sys.stderr)
             t_now = j * deltaT
             log_metrics({
-                "elapsed_time": time.time() - start_time,
+                "calculation_time": time.time() - start_time,
                 "time": t_now,
                 "delta_t": deltaT,
             }, step=j)
@@ -295,7 +295,7 @@ def run(params, log_metrics, serialization_file, dump_files):
     # 最終状態ログ
     t_final = stepmax * deltaT
     log_metrics({
-        "elapsed_time": time.time() - start_time,
+        "calculation_time": time.time() - start_time,
         "time": t_final,
         "delta_t": deltaT,
     }, step=stepmax)

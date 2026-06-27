@@ -146,6 +146,7 @@ def create_initial_state(params, log_params, dump_file):
         particles[i].setCell(cell)
 
         particles[i]._import(G1)
+        particles[i].autotunetimestep = True
 
         particles[i].setDEMProperties(DP['E'], DP['mu'], DP['sigma'], DP['gamma'], DP['mu_r'], R0)
         particles[i].setInertia(R0)
@@ -214,7 +215,7 @@ def run(params, log_metrics, serialization_file, dump_files):
         if j % 50 == 0:
             print(j, end=" ", file=sys.stderr)
             log_metrics({
-                "elapsed_time": time.time() - start_time,
+                "calculation_time": time.time() - start_time,
                 "time": thistime(),
                 "delta_t": thistime.currentDeltaT(),
             }, step=j)
@@ -256,7 +257,7 @@ def run(params, log_metrics, serialization_file, dump_files):
     particles[0].waitPutTMP()
     thistime.PrintStat(j)
     log_metrics({
-        "elapsed_time": time.time() - start_time,
+        "calculation_time": time.time() - start_time,
         "time": thistime(),
         "delta_t": thistime.currentDeltaT(),
     }, step=j)
